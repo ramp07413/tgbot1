@@ -1,6 +1,7 @@
 import asyncio
 from pyrogram import Client, filters
 from os import environ
+from aiohttp import web
 
 API_ID = int(environ.get('API_ID', "14312602"))
 API_HASH = environ.get('API_HASH', "0215ccb8afe30ffabec8e2c466260af9")
@@ -8,11 +9,30 @@ BOT_TOKEN = environ.get('BOT_TOKEN', "7317861894:AAGy29fi9tcklf7d-jkUrmixQmxEyZM
 OWNER_ID = 8199321200
 
 Bot = Client(
-    name="botoz",
+    name="ram",
     bot_token=BOT_TOKEN,
     api_id=API_ID,
     api_hash=API_HASH
 )
+
+routes = web.RouteTableDef()
+
+@routes.get("/", allow_head=True)
+async def root_route_handler(request):
+    return web.json_response("Hello World")
+
+async def web_server():
+    web_app = web.Application(client_max_size=30000000)
+    web_app.add_routes(routes)
+    return web_app
+
+async def start_web_server():
+    app = web.AppRunner(await web_server())
+    await app.setup()
+    bind_address = "0.0.0.0"
+    site = web.TCPSite(app, bind_address, 8080)
+    await site.start()
+    print("Web server started")
 
 @Bot.on_message(filters.command("start"))
 async def start(client, message):
@@ -39,4 +59,12 @@ async def echo(client, message):
     else: 
         pass
 
-Bot.run()
+async def main():
+    # Start the bot and the web server 🙄
+    await asyncio.gather(
+        Bot.start(),
+        start_web_server()
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())
