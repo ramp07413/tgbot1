@@ -1,4 +1,5 @@
 import asyncio
+from pyrogram.errors import FloodWait
 from pyrogram import Client, filters
 from os import environ
 from aiohttp import web
@@ -49,14 +50,27 @@ async def start(client, message):
 #             message_ids=message.id         
 #         )
 
-@Bot.on_message(filters.text & filters.private)
+@Bot.on_message(filters.text & filters.private & ~filters.me)
 async def echo(client, message):
-    if message.from_user.id == OWNER_ID:
+    if message.from_user.id == int(OWNER_ID):
         text = message.text
-        await client.send_message("-1001692649079", text)
-        # await client.send_message("-1002532543989", text)
-        # await client.send_message("-1002691753029", text)
-    else: 
+        try:
+            await client.send_message("-1001692649079", text)
+            # await client.send_message("-1002532543989", text)
+            # await client.send_message("-1002691753029", text)
+        except FloodWait as e:
+            print(f"FloodWait: Sleeping for {e.value} seconds")
+            await asyncio.sleep(e.value)
+            # Retry after sleeping
+            try:
+                await client.send_message("-1001692649079", text)
+                # await client.send_message("-1002532543989", text)
+                # await client.send_message("-1002691753029", text)
+            except Exception as ex:
+                print(f"Failed to send message after FloodWait: {ex}")
+        except Exception as ex:
+            print(f"An error occurred: {ex}")
+    else:
         pass
 
 async def main():
