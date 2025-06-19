@@ -9,13 +9,6 @@ API_HASH = environ.get('API_HASH', "0215ccb8afe30ffabec8e2c466260af9")
 BOT_TOKEN = environ.get('BOT_TOKEN', "7317861894:AAGy29fi9tcklf7d-jkUrmixQmxEyZMX8Co")
 OWNER_ID = 8199321200
 
-Bot = Client(
-    "ram",
-    bot_token=BOT_TOKEN,
-    api_id=API_ID,
-    api_hash=API_HASH
-)
-
 routes = web.RouteTableDef()
 
 @routes.get("/", allow_head=True)
@@ -27,13 +20,25 @@ async def web_server():
     web_app.add_routes(routes)
     return web_app
 
-async def start_web_server():
-    app = web.AppRunner(await web_server())
-    await app.setup()
-    bind_address = "0.0.0.0"
-    site = web.TCPSite(app, bind_address, 8080)
-    await site.start()
-    print("Web server started")
+class Bot(Client):
+    def __init__(self):
+        super().__init__(
+            name="ram",
+            bot_token=BOT_TOKEN,
+            api_id=API_ID,
+            api_hash=API_HASH
+        )
+    async def start(self):
+        await super().start()    
+        me = await self.get_me()
+        app = web.AppRunner(await web_server())
+        await app.setup()
+        await web.TCPSite(app, "0.0.0.0", "8080").start()
+        print(f"{me.first_name} with for Pyrogram (Layer) started on {me.username}.")
+
+    async def stop(self, *args):
+        await super().stop()
+        print("Bot stopped.")
 
 @Bot.on_message(filters.command("start"))
 async def start(client, message):
@@ -73,12 +78,4 @@ async def echo(client, message):
     else:
         pass
 
-async def main():
-    # Start the bot and the web server 🙄
-    await asyncio.gather(
-        Bot.start(),
-        start_web_server()
-    )
-
-if __name__ == "__main__":
-    asyncio.run(main())
+Bot().run()
