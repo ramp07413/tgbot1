@@ -9,7 +9,7 @@ BOT_TOKEN = environ.get('BOT_TOKEN', "7317861894:AAGy29fi9tcklf7d-jkUrmixQmxEyZM
 OWNER_ID = 8199321200
 
 Bot = Client(
-    name="ram",
+    "ram",
     bot_token=BOT_TOKEN,
     api_id=API_ID,
     api_hash=API_HASH
