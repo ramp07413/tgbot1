@@ -43,7 +43,7 @@ class Bot(Client):
 @Bot.on_message(filters.command("start"))
 async def start(client, message):
     await message.reply_text(
-        text=f"Hello, This is echo bot.",
+        text=f"Hello, This is echo bot..",
         disable_web_page_preview=True
     )
 
@@ -80,11 +80,11 @@ async def echo(client, message):
 
 @Bot.on_message(filters.private & filters.command("send"))
 async def send(client, message):
-    msg = message.reply_to_message.text
-    if not msg:
+    if not message.reply_to_message or not message.reply_to_message.text:
         return await message.reply_text("Command Incomplete.")
+    msg = message.reply_to_message.text
     text = message.text
-    if 'http' or 'https' not in text:
+    if 'http' not in text or 'https' not in text:
         try:
             i, chat_id = text.split(' ', 1)
             await client.send_message(chat_id=chat_id, text=msg)
@@ -95,7 +95,7 @@ async def send(client, message):
     try:
         i, link = text.split(' ', 1)
         ok = link.split('/')
-        chat_id = '-100' + ok[4]
+        chat_id = f"-100{ok[4]}"
         msg_id = ok[5]
         await client.send_message(chat_id=int(chat_id), text=msg, reply_to_message_id=int(msg_id))
         await message.reply_text("done")
