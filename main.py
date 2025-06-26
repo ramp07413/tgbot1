@@ -102,5 +102,5 @@ async def send(client, message):
     except Exception as e:
         await message.reply_text(e)
 
-if "__name__" in "__main__":
+if __name__ == "__main__":
     Bot().run()
