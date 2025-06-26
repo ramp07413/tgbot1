@@ -1,0 +1,24 @@
+name: bot testing
+
+on:
+    workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@main
+      
+    - name: Set up Python
+      uses: actions/setup-python@v3
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run test
+      timeout-minutes: 10
+      continue-on-error: true
+      run : |
+        python3 main.py
