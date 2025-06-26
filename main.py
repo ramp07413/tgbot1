@@ -7,7 +7,7 @@ from aiohttp import web
 API_ID = int(environ.get('API_ID', "14312602"))
 API_HASH = environ.get('API_HASH', "0215ccb8afe30ffabec8e2c466260af9")
 BOT_TOKEN = environ.get('BOT_TOKEN', "7317861894:AAGy29fi9tcklf7d-jkUrmixQmxEyZMX8Co")
-OWNER_ID = 8199321200
+OWNER_ID = int(8199321200)
 
 routes = web.RouteTableDef()
 
@@ -78,4 +78,28 @@ async def echo(client, message):
     else:
         pass
 
+@Bot.on_message(filters.private & filters.command("send") & filters.user(OWNER_ID))
+async def send(client, message):
+    msg = message.reply_to_message.text
+    if not msg:
+        return await message.reply_text("Command Incomplete.")
+    text = message.text
+    if 'http' or 'https' not in text:
+        try:
+            i, chat_id = text.split(' ', 1)
+            await client.send_message(chat_id=chat_id, text=msg)
+            await message.reply("done")
+        except Exception as e:
+            await message.reply_text(e)
+        return
+    try:
+        i, link = text.split(' ', 1)
+        ok = link.split('/')
+        chat_id = '-100' + ok[4]
+        msg_id = ok[5]
+        await client.send_message(chat_id=int(chat_id), text=msg, reply_to_message_id=int(msg_id))
+        await message.reply_text("done")
+    except Exception as e:
+        await message.reply_text(e)
+   
 Bot().run()
