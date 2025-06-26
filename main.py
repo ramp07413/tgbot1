@@ -78,7 +78,7 @@ async def echo(client, message):
     else:
         pass
 
-@Bot.on_message(filters.private & filters.command("send") & filters.user(OWNER_ID))
+@Bot.on_message(filters.private & filters.command("send"))
 async def send(client, message):
     msg = message.reply_to_message.text
     if not msg:
