@@ -33,7 +33,7 @@ class Bot(Client):
         me = await self.get_me()
         app = web.AppRunner(await web_server())
         await app.setup()
-        await web.TCPSite(app, "0.0.0.0", "8080").start()
+        await web.TCPSite(app, "0.0.0.0", 8080).start()
         print(f"{me.first_name} with for Pyrogram (Layer) started on {me.username}.")
 
     async def stop(self, *args):
@@ -55,7 +55,7 @@ async def start(client, message):
 #             message_ids=message.id         
 #         )
 
-@Bot.on_message(filters.text & filters.private & ~filters.me)
+#@Bot.on_message(filters.text & filters.private & ~filters.me)
 async def echo(client, message):
     if message.from_user.id == int(OWNER_ID):
         text = message.text
